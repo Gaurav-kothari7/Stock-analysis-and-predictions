@@ -40,7 +40,7 @@ This project provides a Streamlit-based web application for stock analysis and p
 
 ## Project Structure
 
-- `app.py`: The main application file containing the Streamlit app code.
+- `main.py`: The main application file containing the Streamlit app code.
 - `requirements.txt`: Lists all the Python dependencies required for the project.
 - `README.md`: This file, providing an overview and instructions for the project.
 
