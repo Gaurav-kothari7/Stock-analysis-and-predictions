@@ -64,9 +64,12 @@ def create_visualization(data, company_name):
     plt.plot(data.index[-90:], data['Close'][-90:], label='Close Price')
     plt.plot(data.index[-90:], data['SMA20'][-90:], label='20-day SMA')
     plt.plot(data.index[-90:], data['SMA50'][-90:], label='50-day SMA')
-    plt.plot(data.index[-90:], data['BB_upper'][-90:], label='Upper Bollinger Band', linestyle='--')
-    plt.plot(data.index[-90:], data['BB_lower'][-90:], label='Lower Bollinger Band', linestyle='--')
-    plt.fill_between(data.index[-90:], data['BB_upper'][-90:], data['BB_lower'][-90:], alpha=0.1)
+    plt.plot(data.index[-90:], data['BB_upper'][-90:],
+             label='Upper Bollinger Band', linestyle='--')
+    plt.plot(data.index[-90:], data['BB_lower'][-90:],
+             label='Lower Bollinger Band', linestyle='--')
+    plt.fill_between(data.index[-90:], data['BB_upper']
+                     [-90:], data['BB_lower'][-90:], alpha=0.1)
     plt.title('Stock Price, Indicators, and Bollinger Bands (Last 3 Months)')
     plt.xlabel('Date')
     plt.ylabel('Price')
@@ -118,8 +121,10 @@ def make_prediction(data):
         current_batch = np.roll(current_batch, -1, axis=1)
         current_batch[0, -1, 0] = current_pred
 
-    future_predictions = scaler.inverse_transform(np.array(future_predictions).reshape(-1, 1))
-    future_dates = pd.date_range(start=data.index[-1] + pd.Timedelta(days=1), periods=30)
+    future_predictions = scaler.inverse_transform(
+        np.array(future_predictions).reshape(-1, 1))
+    future_dates = pd.date_range(
+        start=data.index[-1] + pd.Timedelta(days=1), periods=30)
 
     return future_dates, future_predictions.flatten()
 
@@ -132,7 +137,8 @@ def prepare_data_for_bullish_prediction(data):
 
 
 def create_bullish_prediction_model(X, y):
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42)
     model = RandomForestClassifier(n_estimators=100, random_state=42)
     model.fit(X_train, y_train)
 
@@ -170,7 +176,8 @@ def generate_report(company_name, data, stock, bullish_model, bullish_accuracy, 
     # Add bullish prediction
     prediction, probability = predict_tomorrow_bullish(bullish_model, data)
     report += f"Bullish Prediction for Tomorrow:\n"
-    report += f"Prediction: {'Bullish' if prediction == 1 else 'Not Bullish'}\n"
+    report += f"Prediction: {'Bullish' if prediction ==
+                             1 else 'Not Bullish'}\n"
     report += f"Probability of being Bullish: {probability:.2f}\n\n"
     report += f"Bullish Prediction Model Accuracy: {bullish_accuracy:.2f}\n"
     report += f"Bullish Prediction Model Report:\n{bullish_report}\n"
@@ -182,12 +189,13 @@ def generate_report(company_name, data, stock, bullish_model, bullish_accuracy, 
 
 def main():
     # Set up the API key for OpenAI
-    open_api_key = "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"
+    open_api_key = "YOUR_API_KEY_HERE"
     os.environ["OPENAI_API_KEY"] = open_api_key
 
     # Streamlit title and input
     st.title('Stock Analysis and Prediction')
-    company_name = st.text_input("Enter the company stock symbol (e.g., AAPL for Apple):")
+    company_name = st.text_input(
+        "Enter the company stock symbol (e.g., AAPL for Apple):")
 
     if company_name:
         data, stock = get_stock_data(company_name)
@@ -196,7 +204,8 @@ def main():
         future_dates, future_prices = make_prediction(data)
 
         X, y = prepare_data_for_bullish_prediction(data)
-        bullish_model, bullish_accuracy, bullish_report = create_bullish_prediction_model(X, y)
+        bullish_model, bullish_accuracy, bullish_report = create_bullish_prediction_model(
+            X, y)
 
         report = generate_report(company_name, data, stock, bullish_model, bullish_accuracy, bullish_report,
                                  future_dates, future_prices)
@@ -206,11 +215,13 @@ def main():
         llm = ChatOpenAI(model_name='gpt-3.5-turbo')
         chat_messages = [
             SystemMessage(content='You are an expert financial advisor'),
-            HumanMessage(content=f'Please provide a short and concise summary of the following report and impact of each indicator for investment purpose:\n TEXT: {report}')
+            HumanMessage(
+                content=f'Please provide a short and concise summary of the following report and impact of each indicator for investment purpose:\n TEXT: {report}')
         ]
         summary = llm(chat_messages).content
         st.subheader('Summary')
         st.write(summary)
+
 
 if __name__ == "__main__":
     main()
